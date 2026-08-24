@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../config/siteConfig';
 import type { EnquiryFormData } from '../types';
-import { Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { submitEnquiry } from '../services/enquiryService';
 import {
   Select,
   SelectContent,
@@ -28,7 +29,9 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
     withCustomLogo: false,
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedEnquiryId, setSubmittedEnquiryId] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState('');
 
   // Update selected product when prop changes
@@ -59,19 +62,33 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       setErrorMsg('Please enter your full name.');
       return;
     }
-    if (!formData.email.trim() && !formData.phone.trim()) {
-      setErrorMsg('Please provide either an email or phone number so we can contact you.');
+    if (!formData.email?.trim() && !formData.phone?.trim()) {
+      setErrorMsg('Please provide either an email address or phone number so our team can reach you.');
       return;
     }
 
     setErrorMsg('');
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    try {
+      const result = await submitEnquiry(formData);
+      if (result.success) {
+        setSubmittedEnquiryId(result.enquiryId || '');
+        setSubmitted(true);
+      } else {
+        setErrorMsg(result.error || 'Failed to submit enquiry. Please try again.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -83,7 +100,7 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="text-center py-10 space-y-5"
+            className="text-center py-8 sm:py-10 space-y-5"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -93,28 +110,38 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             >
               <CheckCircle2 className="w-8 h-8" />
             </motion.div>
-            <h3 className="font-serif text-3xl text-navy font-medium">
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-100 border border-surface-300 rounded-full text-xs font-mono font-semibold text-navy">
+              <span>Ref:</span>
+              <span className="text-champagne font-bold">
+                #TL-{submittedEnquiryId ? submittedEnquiryId.slice(0, 8).toUpperCase() : 'REC'}
+              </span>
+            </div>
+
+            <h3 className="font-serif text-2xl sm:text-3xl text-navy font-medium">
               Thank You for Your Enquiry
             </h3>
+
             <p className="text-slateText-muted max-w-md mx-auto text-sm sm:text-base leading-relaxed font-normal">
-              We have received your details. Our team in Hokandara will review your hospitality specifications and reach out to you promptly.
+              We have received your hospitality requirements. Our production & sales team in Hokandara will review your specifications and get in touch with you shortly.
             </p>
 
             <div className="pt-4 flex items-center justify-center">
               <button
                 onClick={() => {
                   setSubmitted(false);
+                  setSubmittedEnquiryId('');
                   setFormData({
                     name: '',
                     company: '',
                     email: '',
                     phone: '',
-                    productInterest: 'Table Napkins',
+                    productInterest: 'Table Napkins / Serviettes',
                     message: '',
                     withCustomLogo: false,
                   });
                 }}
-                className="inline-flex items-center justify-center bg-navy hover:bg-champagne hover:text-navy text-white px-6 py-2.5 rounded-full text-xs uppercase tracking-widest font-bold transition-colors shadow-sm"
+                className="inline-flex items-center justify-center bg-navy hover:bg-champagne hover:text-navy text-white px-7 py-3 rounded-full text-xs uppercase tracking-widest font-bold transition-colors shadow-sm cursor-pointer"
               >
                 Submit Another Request
               </button>
@@ -127,7 +154,7 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onSubmit={handleSubmit}
-            className="space-y-6"
+            className="space-y-5 sm:space-y-6"
           >
             <div className="border-b border-surface-200 pb-4">
               <h3 className="font-serif text-2xl sm:text-3xl text-navy font-medium">
@@ -150,7 +177,7 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             )}
 
             {/* Row 1: Name & Company */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label htmlFor="name" className="block text-xs uppercase tracking-wider font-semibold text-navy mb-2">
                   Your Name <span className="text-rose-600">*</span>
@@ -184,7 +211,7 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             </div>
 
             {/* Row 2: Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label htmlFor="email" className="block text-xs uppercase tracking-wider font-semibold text-navy mb-2">
                   Email Address
@@ -278,18 +305,28 @@ export const EnquiryForm: React.FC<EnquiryFormProps> = ({ preselectedProduct }) 
             {/* Submit Actions */}
             <div className="pt-2">
               <motion.button
-                whileHover={{ scale: 1.01, backgroundColor: '#C59B5F', color: '#0F172A' }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: isSubmitting ? 1 : 1.01, backgroundColor: isSubmitting ? '#0F172A' : '#C59B5F', color: isSubmitting ? '#ffffff' : '#0F172A' }}
+                whileTap={{ scale: isSubmitting ? 1 : 0.99 }}
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 bg-navy text-white py-4 px-8 rounded-full text-xs uppercase tracking-[0.22em] font-bold transition-colors duration-200 shadow-lg"
+                disabled={isSubmitting}
+                className="w-full inline-flex items-center justify-center gap-2 bg-navy text-white py-4 px-8 rounded-full text-xs uppercase tracking-[0.22em] font-bold transition-colors duration-200 shadow-lg cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
               >
-                <span>Send Enquiry</span>
-                <Send className="w-3.5 h-3.5" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Processing Enquiry...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Send Enquiry</span>
+                    <Send className="w-3.5 h-3.5" />
+                  </>
+                )}
               </motion.button>
             </div>
 
             <div className="text-center text-[11px] text-slateText-muted pt-1">
-              No account required. We will respond directly via phone or email.
+              Protected by Supabase & Resend. We will respond directly to your hospitality inquiry.
             </div>
           </motion.form>
         )}
