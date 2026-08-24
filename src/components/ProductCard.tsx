@@ -17,6 +17,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onView,
   index,
 }) => {
+  const [isLoaded, setIsLoaded] = React.useState(false);
+
   return (
     <motion.div
       layout
@@ -30,23 +32,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Image Container with View / Zoom Click */}
       <div
         onClick={() => onView?.(product)}
-        className="relative aspect-[4/3] overflow-hidden bg-surface-100 cursor-pointer"
+        className="relative aspect-[4/3] overflow-hidden bg-surface-200 cursor-pointer"
         role="button"
         tabIndex={0}
         aria-label={`View larger image of ${product.name}`}
       >
+        {/* Placeholder skeleton before load */}
+        {!isLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-200 via-surface-100 to-surface-200 animate-pulse" />
+        )}
         <motion.img
           whileHover={{ scale: 1.08 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           src={product.image}
           alt={product.altText}
+          onLoad={() => setIsLoaded(true)}
           onError={(e) => {
             const target = e.currentTarget;
             if (!target.src.includes('table-napkins.jpg')) {
               target.src = cdnImage('table-napkins.jpg');
             }
+            setIsLoaded(true);
           }}
-          className="w-full h-full object-cover object-center"
+          className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           loading="lazy"
           decoding="async"
         />
