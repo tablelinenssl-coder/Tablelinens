@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../config/siteConfig';
+import { cdnImage } from '../lib/assets';
 import { Scissors, Check, ArrowRight } from 'lucide-react';
 
 interface CustomEmbroideryProps {
@@ -118,8 +119,8 @@ export const CustomEmbroidery: React.FC<CustomEmbroideryProps> = ({ onEnquire })
                 <img
                   src={
                     activeTab === 'with'
-                      ? '/images/embroidery-with-logo.jpg'
-                      : '/images/embroidery-without-logo.jpg'
+                      ? cdnImage('embroidery-with-logo.jpg')
+                      : cdnImage('embroidery-without-logo.jpg')
                   }
                   alt={
                     activeTab === 'with'
@@ -128,7 +129,7 @@ export const CustomEmbroidery: React.FC<CustomEmbroideryProps> = ({ onEnquire })
                   }
                   onError={(e) => {
                     const target = e.currentTarget;
-                    target.src = '/images/story-craft.jpg';
+                    target.src = cdnImage('story-craft.jpg');
                   }}
                   className="w-full h-full object-cover object-center transform hover:scale-105 transition-all duration-700"
                   loading="lazy"

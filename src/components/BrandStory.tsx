@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { siteConfig } from '../config/siteConfig';
+import { cdnImage } from '../lib/assets';
 import { Check, ArrowRight, Scissors, Hotel, Utensils, ShieldCheck } from 'lucide-react';
 
 export const BrandStory: React.FC = () => {
@@ -30,7 +31,7 @@ export const BrandStory: React.FC = () => {
           <motion.div style={{ y: yLeft }} className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[3/4] bg-surface-200">
               <img
-                src="/images/story-craft.jpg"
+                src={cdnImage('story-craft.jpg')}
                 alt="Handcrafted table linen craftsmanship in Sri Lanka"
                 className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700"
                 loading="lazy" decoding="async"

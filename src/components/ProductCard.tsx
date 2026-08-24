@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '../types';
 import { ArrowUpRight, ZoomIn } from 'lucide-react';
+import { cdnImage } from '../lib/assets';
 
 interface ProductCardProps {
   product: Product;
@@ -42,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           onError={(e) => {
             const target = e.currentTarget;
             if (!target.src.includes('table-napkins.jpg')) {
-              target.src = '/images/table-napkins.jpg';
+              target.src = cdnImage('table-napkins.jpg');
             }
           }}
           className="w-full h-full object-cover object-center"

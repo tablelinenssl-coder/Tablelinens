@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { siteConfig } from '../config/siteConfig';
+import { cdnImage } from '../lib/assets';
 import { ChevronRight } from 'lucide-react';
 
 interface HeroProps { onOpenEnquiry: () => void; }
@@ -28,7 +29,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenEnquiry }) => {
         className="absolute inset-0 z-0"
       >
         <img
-          src="/images/hero-bg.jpg"
+          src={cdnImage('hero-bg.jpg')}
           alt="Luxury hotel dining table setting"
           className="w-full h-full object-cover object-center scale-110"
         />
