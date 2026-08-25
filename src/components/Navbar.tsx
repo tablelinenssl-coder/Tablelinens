@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { siteConfig } from '../config/siteConfig';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 
@@ -13,22 +13,47 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenEnquiry }) => {
   const [activeSection, setActiveSection] = useState('hero');
 
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 25, restDelta: 0.001 });
 
   useEffect(() => {
+    let ticking = false;
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 30);
-      const ids = ['about', 'collection', 'embroidery', 'contact'];
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (el) {
-          const r = el.getBoundingClientRect();
-          if (r.top <= 160 && r.bottom >= 160) { setActiveSection(id); break; }
-        }
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 30);
+          ticking = false;
+        });
+        ticking = true;
       }
     };
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    // Zero-overhead active section tracking with IntersectionObserver
+    const ids = ['about', 'collection', 'embroidery', 'contact'];
+    const observers: IntersectionObserver[] = [];
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setActiveSection(id);
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -60% 0px' }
+        );
+        obs.observe(el);
+        observers.push(obs);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      observers.forEach((obs) => obs.disconnect());
+    };
   }, []);
 
   const goto = (href: string) => {
@@ -41,17 +66,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenEnquiry }) => {
       {/* Champagne scroll progress bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-champagne-dark via-champagne to-champagne-light z-50 origin-left"
-        style={{ scaleX }}
+        style={{ scaleX: scrollYProgress }}
       />
 
       <motion.header
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-400 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/96 backdrop-blur-lg shadow-md border-b border-surface-200 py-3'
-            : 'bg-pearl/80 backdrop-blur-sm border-b border-surface-200/30 py-4'
+            ? 'bg-white/95 shadow-md border-b border-surface-200 py-3'
+            : 'bg-pearl/90 border-b border-surface-200/40 py-4'
         }`}
       >
         <div className="max-w-6xl mx-auto px-5 sm:px-8 flex items-center justify-between">

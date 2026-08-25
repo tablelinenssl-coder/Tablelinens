@@ -23,29 +23,25 @@ export const Hero: React.FC<HeroProps> = ({ onOpenEnquiry }) => {
 
   return (
     <section id="hero" ref={ref} className="relative min-h-screen flex items-center overflow-hidden bg-midnight">
-      {/* Parallax Background Image */}
+      {/* Parallax Background Image with GPU acceleration */}
       <motion.div
         style={{ y: yImg }}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 will-change-transform"
       >
         <img
           src={cdnImage('hero-bg.jpg')}
           alt="Luxury hotel dining table setting"
-          className="w-full h-full object-cover object-center scale-110"
+          className="w-full h-full object-cover object-center scale-105"
+          fetchPriority="high"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-midnight/92 via-midnight/70 to-midnight/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-midnight/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-midnight/95 via-midnight/75 to-midnight/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-midnight/90 via-transparent to-transparent" />
       </motion.div>
-
-      {/* Animated grain texture overlay */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none"
-        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.4\'/%3E%3C/svg%3E")', backgroundSize: '200px' }}
-      />
 
       {/* Main content */}
       <motion.div
         style={{ y: yText, opacity: opacityHero }}
-        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-8 pt-24 sm:pt-28 pb-16 sm:pb-20 w-full"
+        className="relative z-10 max-w-6xl mx-auto px-4 sm:px-8 pt-24 sm:pt-28 pb-16 sm:pb-20 w-full will-change-transform"
       >
         <div className="max-w-3xl">
 

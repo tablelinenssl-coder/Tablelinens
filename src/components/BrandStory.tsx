@@ -28,7 +28,7 @@ export const BrandStory: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
 
           {/* Left: Image with parallax */}
-          <motion.div style={{ y: yLeft }} className="relative">
+          <motion.div style={{ y: yLeft }} className="relative will-change-transform">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[3/4] bg-surface-200">
               <img
                 src={cdnImage('story-craft.jpg')}
@@ -70,7 +70,7 @@ export const BrandStory: React.FC = () => {
           </motion.div>
 
           {/* Right: Text content with parallax */}
-          <motion.div style={{ y: yRight }} className="flex flex-col items-start">
+          <motion.div style={{ y: yRight }} className="flex flex-col items-start will-change-transform">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}

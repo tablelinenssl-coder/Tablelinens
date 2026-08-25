@@ -14,15 +14,15 @@ export const App: React.FC = () => {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Initialize luxury Lenis momentum smooth scrolling
+    // Initialize high-performance Lenis smooth scrolling
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.85,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      touchMultiplier: 1.6,
-      wheelMultiplier: 0.95,
+      wheelMultiplier: 1.0,
+      syncTouch: false,
     });
     lenisRef.current = lenis;
 
